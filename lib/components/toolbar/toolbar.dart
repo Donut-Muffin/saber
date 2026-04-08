@@ -335,6 +335,26 @@ class _ToolbarState extends State<Toolbar> {
             runSpacing: 8,
             children: [
               ToolbarIconButton(
+                tooltip: t.editor.toolbar.undo,
+                enabled: !widget.readOnly && widget.isUndoPossible,
+                onPressed: widget.undo,
+                padding: buttonPadding,
+                child: const AdaptiveIcon(
+                  icon: Icons.undo,
+                  cupertinoIcon: CupertinoIcons.arrow_uturn_left,
+                ),
+              ),
+              ToolbarIconButton(
+                tooltip: t.editor.toolbar.redo,
+                enabled: !widget.readOnly && widget.isRedoPossible,
+                onPressed: widget.redo,
+                padding: buttonPadding,
+                child: const AdaptiveIcon(
+                  icon: Icons.redo,
+                  cupertinoIcon: CupertinoIcons.arrow_uturn_right,
+                ),
+              ),
+              ToolbarIconButton(
                 tooltip: Pen.currentPen.name,
                 selected: widget.currentTool == Pen.currentPen,
                 enabled: !widget.readOnly,
@@ -351,27 +371,30 @@ class _ToolbarState extends State<Toolbar> {
                   }
                 },
                 padding: buttonPadding,
-                child: UniIcon(Pen.currentPen.icon, size: 16),
+                child: const AdaptiveIcon(
+                  icon: Icons.create,
+                  cupertinoIcon: CupertinoIcons.pencil_outline,
+                ),
               ),
-              ToolbarIconButton(
-                tooltip: t.editor.pens.pencil,
-                selected: widget.currentTool == Pencil.currentPencil,
-                enabled: !widget.readOnly,
-                onPressed: () {
-                  if (widget.currentTool == Pencil.currentPencil) {
-                    if (toolOptionsType.value == .pencil) {
-                      toolOptionsType.value = .hide;
-                    } else {
-                      toolOptionsType.value = .pencil;
-                    }
-                  } else {
-                    toolOptionsType.value = .hide;
-                    widget.setTool(Pencil.currentPencil);
-                  }
-                },
-                padding: buttonPadding,
-                child: const FaIcon(Pencil.pencilIcon, size: 16),
-              ),
+              // ToolbarIconButton(
+              //   tooltip: t.editor.pens.pencil,
+              //   selected: widget.currentTool == Pencil.currentPencil,
+              //   enabled: !widget.readOnly,
+              //   onPressed: () {
+              //     if (widget.currentTool == Pencil.currentPencil) {
+              //       if (toolOptionsType.value == .pencil) {
+              //         toolOptionsType.value = .hide;
+              //       } else {
+              //         toolOptionsType.value = .pencil;
+              //       }
+              //     } else {
+              //       toolOptionsType.value = .hide;
+              //       widget.setTool(Pencil.currentPencil);
+              //     }
+              //   },
+              //   padding: buttonPadding,
+              //   child: const FaIcon(Pencil.pencilIcon, size: 16),
+              // ),
               ToolbarIconButton(
                 tooltip: t.editor.pens.highlighter,
                 selected: widget.currentTool == Highlighter.currentHighlighter,
@@ -389,7 +412,10 @@ class _ToolbarState extends State<Toolbar> {
                   }
                 },
                 padding: buttonPadding,
-                child: const FaIcon(Highlighter.highlighterIcon, size: 16),
+                child: const AdaptiveIcon(
+                  icon: Icons.border_color,
+                  cupertinoIcon: CupertinoIcons.pencil_ellipsis_rectangle,
+                ),
               ),
               // ValueListenableBuilder(
               //   valueListenable: showColorOptions,
@@ -468,25 +494,28 @@ class _ToolbarState extends State<Toolbar> {
                       : null,
                 ),
               ),
-              ToolbarIconButton(
-                tooltip: t.editor.pens.laserPointer,
-                selected:
-                    widget.currentTool == LaserPointer.currentLaserPointer,
-                enabled: true, // even in read-only mode
-                onPressed: () {
-                  toolOptionsType.value = .hide;
-                  widget.setTool(LaserPointer.currentLaserPointer);
-                },
-                padding: buttonPadding,
-                child: const Icon(Symbols.stylus_laser_pointer),
-              ),
+              // ToolbarIconButton(
+              //   tooltip: t.editor.pens.laserPointer,
+              //   selected:
+              //       widget.currentTool == LaserPointer.currentLaserPointer,
+              //   enabled: true, // even in read-only mode
+              //   onPressed: () {
+              //     toolOptionsType.value = .hide;
+              //     widget.setTool(LaserPointer.currentLaserPointer);
+              //   },
+              //   padding: buttonPadding,
+              //   child: const Icon(Symbols.stylus_laser_pointer),
+              // ),
               ToolbarIconButton(
                 tooltip: t.editor.toolbar.toggleEraser,
                 selected: widget.currentTool is Eraser,
                 enabled: !widget.readOnly,
                 onPressed: toggleEraser,
                 padding: buttonPadding,
-                child: const FaIcon(FontAwesomeIcons.eraser, size: 16),
+                child: const AdaptiveIcon(
+                  icon: Icons.auto_fix_normal,
+                  cupertinoIcon: CupertinoIcons.burn,
+                ),
               ),
               ToolbarIconButton(
                 tooltip: t.editor.toolbar.photo,
@@ -498,17 +527,17 @@ class _ToolbarState extends State<Toolbar> {
                   cupertinoIcon: CupertinoIcons.photo,
                 ),
               ),
-              ToolbarIconButton(
-                tooltip: t.editor.toolbar.text,
-                selected: widget.textEditing,
-                enabled: !widget.readOnly,
-                onPressed: widget.toggleTextEditing,
-                padding: buttonPadding,
-                child: const AdaptiveIcon(
-                  icon: Icons.text_fields,
-                  cupertinoIcon: CupertinoIcons.text_cursor,
-                ),
-              ),
+              // ToolbarIconButton(
+              //   tooltip: t.editor.toolbar.text,
+              //   selected: widget.textEditing,
+              //   enabled: !widget.readOnly,
+              //   onPressed: widget.toggleTextEditing,
+              //   padding: buttonPadding,
+              //   child: const AdaptiveIcon(
+              //     icon: Icons.text_fields,
+              //     cupertinoIcon: CupertinoIcons.text_cursor,
+              //   ),
+              // ),
               if (!stows.hideFingerDrawingToggle.value)
                 ValueListenableBuilder(
                   valueListenable: stows.editorFingerDrawing,
@@ -538,31 +567,7 @@ class _ToolbarState extends State<Toolbar> {
                       : CupertinoIcons.fullscreen,
                 ),
               ),
-              Wrap(
-                direction: isToolbarVertical ? Axis.vertical : Axis.horizontal,
-                children: [
-                  ToolbarIconButton(
-                    tooltip: t.editor.toolbar.undo,
-                    enabled: !widget.readOnly && widget.isUndoPossible,
-                    onPressed: widget.undo,
-                    padding: buttonPadding,
-                    child: const AdaptiveIcon(
-                      icon: Icons.undo,
-                      cupertinoIcon: CupertinoIcons.arrow_uturn_left,
-                    ),
-                  ),
-                  ToolbarIconButton(
-                    tooltip: t.editor.toolbar.redo,
-                    enabled: !widget.readOnly && widget.isRedoPossible,
-                    onPressed: widget.redo,
-                    padding: buttonPadding,
-                    child: const AdaptiveIcon(
-                      icon: Icons.redo,
-                      cupertinoIcon: CupertinoIcons.arrow_uturn_right,
-                    ),
-                  ),
-                ],
-              ),
+
               ValueListenableBuilder(
                 valueListenable: showExportOptions,
                 builder: (context, showExportOptions, child) {

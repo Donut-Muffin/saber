@@ -55,6 +55,7 @@ import 'package:saber/pages/home/whiteboard.dart';
 import 'package:sbn/color_change.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:super_clipboard/super_clipboard.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 typedef _PhotoInfo = ({Uint8List bytes, String extension});
 
@@ -119,6 +120,31 @@ class EditorState extends State<Editor> {
     } else {
       final middle = gestureDetector.containerBounds.maxHeight / 2;
       return (translation.y - middle) / scale + middle;
+    }
+  }
+
+  set scrollY(double value) {
+    log.warning(
+      'New scrollY setter in use. Attempting to set transformation with risk.',
+    );
+    final transformation = _transformationController.value;
+    final scale = transformation.approxScale;
+    final translation = transformation.getTranslation();
+    final gestureDetector = _canvasGestureDetectorKey.currentState;
+
+    if (gestureDetector == null) {
+      transformation.setTranslation(
+        Vector3(translation.x, value * scale, translation.y),
+      );
+    } else {
+      final middle = gestureDetector.containerBounds.maxHeight / 2;
+      transformation.setTranslation(
+        Vector3(
+          translation.x,
+          (value - middle) * scale + middle,
+          translation.z,
+        ),
+      );
     }
   }
 
@@ -1526,6 +1552,57 @@ class EditorState extends State<Editor> {
               autosaveAfterDelay();
             });
           },
+          moveUpOnePage: () {
+            final Select select = currentTool as Select;
+            if (!select.doneSelecting) {
+              return;
+            }
+            if (coreInfo.pages.length - 1 <= 0) {
+              // Can't move it to the -1 th page
+              return;
+            }
+
+            setState(() {
+              final page = coreInfo.pages[select.selectResult.pageIndex];
+              final lastPage =
+                  coreInfo.pages[select.selectResult.pageIndex - 1];
+              final strokes = select.selectResult.strokes;
+              final images = select.selectResult.images;
+
+              List<Stroke> newStrokes = [];
+              List<EditorImage> newImages = [];
+              for (final stroke in strokes) {
+                page.strokes.remove(stroke);
+                Stroke newStroke = stroke.copy();
+                lastPage.strokes.add(newStroke);
+                newStrokes.add(newStroke);
+              }
+              for (final image in images) {
+                page.images.remove(image);
+                EditorImage newImage = image.copy();
+                lastPage.images.add(newImage);
+                newImages.add(newImage);
+              }
+
+              // select.unselect();
+              select.selectResult = select.selectResult.copyWith(
+                pageIndex: select.selectResult.pageIndex - 1,
+                strokes: newStrokes,
+                images: newImages,
+                // path: select.selectResult.path,
+              );
+              // Scroll 1 page up
+              final gestureDetector = _canvasGestureDetectorKey.currentState;
+              if (gestureDetector == null) {
+                scrollY += 100;
+              } else {
+                scrollY += gestureDetector.containerBounds.maxHeight * 2;
+              }
+
+              autosaveAfterDelay();
+            });
+          },
+          moveDownOnePage: () => {},
           setColor: (color) {
             setState(() {
               updateColorBar(color);
@@ -1536,8 +1613,7 @@ class EditorState extends State<Editor> {
                 );
               } else if (currentTool is Pen) {
                 (currentTool as Pen).color = color;
-              } else if (currentTool is SelectLasso ||
-                  currentTool is SelectBox) {
+              } else if (currentTool is Select) {
                 // Changes color of selected strokes
                 final Select select = currentTool as Select;
                 if (select.doneSelecting) {

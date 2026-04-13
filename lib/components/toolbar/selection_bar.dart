@@ -6,11 +6,15 @@ import 'package:saber/i18n/strings.g.dart';
 class SelectionBar extends StatelessWidget {
   final VoidCallback duplicateSelection;
   final VoidCallback deleteSelection;
+  final VoidCallback moveUpOnePage;
+  final VoidCallback moveDownOnePage;
 
   const SelectionBar({
     super.key,
     required this.duplicateSelection,
     required this.deleteSelection,
+    required this.moveUpOnePage,
+    required this.moveDownOnePage,
   });
 
   @override
@@ -42,6 +46,32 @@ class SelectionBar extends StatelessWidget {
           icon: const AdaptiveIcon(
             icon: Icons.delete,
             cupertinoIcon: CupertinoIcons.delete,
+          ),
+          // This is for the buttons to move
+          // text a page up,and down
+        ),
+        IconButton(
+          onPressed: moveUpOnePage,
+          style: TextButton.styleFrom(
+            foregroundColor: ColorScheme.of(context).secondary,
+            backgroundColor: Colors.transparent,
+            shape: const CircleBorder(),
+          ),
+          icon: const AdaptiveIcon(
+            icon: Icons.north,
+            cupertinoIcon: CupertinoIcons.up_arrow,
+          ),
+        ),
+        IconButton(
+          onPressed: moveDownOnePage,
+          style: TextButton.styleFrom(
+            foregroundColor: ColorScheme.of(context).secondary,
+            backgroundColor: Colors.transparent,
+            shape: const CircleBorder(),
+          ),
+          icon: const AdaptiveIcon(
+            icon: Icons.south,
+            cupertinoIcon: CupertinoIcons.down_arrow,
           ),
         ),
       ],

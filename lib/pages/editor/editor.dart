@@ -1592,12 +1592,12 @@ class EditorState extends State<Editor> {
                 // path: select.selectResult.path,
               );
               // Scroll 1 page up
-              final gestureDetector = _canvasGestureDetectorKey.currentState;
-              if (gestureDetector == null) {
-                scrollY += 100;
-              } else {
-                scrollY += gestureDetector.containerBounds.maxHeight * 2;
-              }
+              // final gestureDetector = _canvasGestureDetectorKey.currentState;
+              // if (gestureDetector == null) {
+              //   scrollY += 100;
+              // } else {
+              //   scrollY += gestureDetector.containerBounds.maxHeight * 2;
+              // }
 
               autosaveAfterDelay();
             });
